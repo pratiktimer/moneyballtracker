@@ -155,9 +155,17 @@ export const useStoreEntries = defineStore("entries", () => {
     });
   };
 
-  const updateEntry = (entryId, updates) => {
-    const index = getEntryIndexById(entryId);
-    Object.assign(entries.value[index], updates);
+  const updateEntry = async (entryId, updates) => {
+    const { error } = await supabase
+      .from("entries")
+      .update(updates)
+      .eq("id", entryId)
+      .select();
+
+    if (error) {
+      useShowErrorMessage("Could not update entry: " + error.message);
+      return;
+    }
   };
 
   const sortEnd = ({ oldIndex, newIndex }) => {
