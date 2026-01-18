@@ -182,6 +182,24 @@ export const useStoreEntries = defineStore("entries", () => {
     const movedEntry = entries.value[oldIndex];
     entries.value.splice(oldIndex, 1);
     entries.value.splice(newIndex, 0, movedEntry);
+    updateEntryOrderNumbers();
+  };
+
+  const updateEntryOrderNumbers = async () => {
+    let currentOrder = 1;
+    entries.value.forEach(async (entry) => {
+      entry.order = currentOrder;
+      currentOrder++;
+    });
+    const entriesUpsert = entries.value.map((entry) => ({
+      id: entry.id,
+      order: entry.order,
+    }));
+    const { error } = await supabase.from("entries").upsert(entriesUpsert);
+    if (error) {
+      useShowErrorMessage("Could not update entry order: " + error.message);
+      return;
+    }
   };
 
   /*
