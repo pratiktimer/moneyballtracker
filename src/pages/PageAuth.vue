@@ -8,6 +8,33 @@
           <q-tab name="register" label="Register" />
         </q-tabs>
       </q-card-section>
+
+      <q-card-section>
+        <q-form v-if="tab === 'login'" class="q-gutter-md">
+          <q-input
+            class="q-mb-md"
+            bg-color="white"
+            filled
+            label="Email"
+            type="email"
+            autocomplete="email"
+          />
+          <q-input
+            bg-color="white"
+            filled
+            label="Password"
+            type="password "
+            autocomplete="current-password"
+          />
+          <q-btn
+            to="/"
+            color="white"
+            class="full-width"
+            label="Login"
+            outline
+          />
+        </q-form>
+      </q-card-section>
     </q-card>
   </q-page>
 </template>

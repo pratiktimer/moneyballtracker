@@ -53,6 +53,17 @@
             <q-item-label>Quit</q-item-label>
           </q-item-section>
         </q-item>
+        <q-separator spaced />
+
+        <q-item to="/auth" clickable class="text-white" tag="a">
+          <q-item-section avatar>
+            <q-icon name="logout" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Log out</q-item-label>
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
