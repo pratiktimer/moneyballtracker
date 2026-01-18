@@ -3,6 +3,7 @@ import { ref, computed, reactive, nextTick } from "vue";
 import { Notify } from "quasar";
 import supabase from "src/config/supabase";
 import { useShowErrorMessage } from "src/use/useShowErrorMessage";
+import { useNonReactiveCopy } from "src/use/useNonReactiveCopy";
 
 export const useStoreEntries = defineStore("entries", () => {
   /*
@@ -156,7 +157,8 @@ export const useStoreEntries = defineStore("entries", () => {
   };
 
   const updateEntry = async (entryId, updates) => {
-    const index = getEntryIndexById(entryId);
+    const index = getEntryIndexById(entryId),
+      oldEntry = useNonReactiveCopy(entries.value[index]);
 
     Object.assign(entries.value[index], updates);
 
@@ -168,6 +170,7 @@ export const useStoreEntries = defineStore("entries", () => {
 
     if (error) {
       useShowErrorMessage("Could not update entry: " + error.message);
+      Object.assign(entries.value[index], oldEntry);
       return;
     }
   };
