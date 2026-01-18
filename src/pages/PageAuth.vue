@@ -1,14 +1,25 @@
 <template>
   <q-page class="flex flex-center">
     <q-card class="auth bg-primary text-white q-pa-lg">
-      <toolbar-title></toolbar-title>
+      <q-card-section><ToolbarTitle></ToolbarTitle></q-card-section>
+      <q-card-section>
+        <q-tabs v-model="tab" no-caps>
+          <q-tab name="login" label="Login" />
+          <q-tab name="register" label="Register" />
+        </q-tabs>
+      </q-card-section>
     </q-card>
   </q-page>
 </template>
 <script setup>
-import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
-
 /*
 imports
 */
+import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
+import { ref } from "vue";
+/*
+tabs
+*/
+
+const tab = ref("login");
 </script>
