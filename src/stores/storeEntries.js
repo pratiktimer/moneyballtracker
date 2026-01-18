@@ -156,6 +156,10 @@ export const useStoreEntries = defineStore("entries", () => {
   };
 
   const updateEntry = async (entryId, updates) => {
+    const index = getEntryIndexById(entryId);
+
+    Object.assign(entries.value[index], updates);
+
     const { error } = await supabase
       .from("entries")
       .update(updates)
