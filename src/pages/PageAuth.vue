@@ -10,8 +10,9 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form>
+        <q-form @submit="formSubmit">
           <q-input
+            v-model="credentials.email"
             class="q-mb-md"
             :bg-color="useLightOrDark('white', 'black')"
             filled
@@ -20,6 +21,7 @@
             autocomplete="email"
           />
           <q-input
+            v-model="credentials.password"
             class="q-mb-md"
             :bg-color="useLightOrDark('white', 'black')"
             filled
@@ -28,9 +30,9 @@
             autocomplete="current-password"
           />
           <q-btn
-            to="/"
             color="white"
             class="full-width"
+            type="submit"
             :label="submitButtonTitle"
             outline
           />
@@ -44,7 +46,7 @@
 imports
 */
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useLightOrDark } from "src/use/useLightOrDark";
 /*
 tabs
@@ -59,4 +61,19 @@ submit button title
 const submitButtonTitle = computed(() => {
   return tab.value === "login" ? "Login" : "Register";
 });
+
+/*
+form
+*/
+
+const credentials = reactive({
+  email: "",
+  password: "",
+});
+
+const formSubmit = () => {
+  if (tab.value === "login") {
+    console.log("Logging in with", credentials);
+  }
+};
 </script>
