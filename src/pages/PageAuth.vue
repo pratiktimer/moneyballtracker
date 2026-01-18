@@ -26,7 +26,7 @@
             :bg-color="useLightOrDark('white', 'black')"
             filled
             label="Password"
-            type="password "
+            type="password"
             autocomplete="current-password"
           />
           <q-btn
@@ -49,11 +49,17 @@ import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
 import { computed, reactive, ref } from "vue";
 import { useLightOrDark } from "src/use/useLightOrDark";
 import { Dialog } from "quasar";
+import { useRouter } from "vue-router";
 /*
 tabs
 */
 
 const tab = ref("login");
+
+/*
+router
+*/
+const router = useRouter();
 
 /*
 submit button title
@@ -79,6 +85,20 @@ const formSubmit = () => {
       message: "Please enter both email and password.",
     });
     return;
+  } else {
+    formSubmitSuccess();
   }
+};
+
+const formSubmitSuccess = () => {
+  if (tab.value === "login") {
+    // login logic here
+    console.log("Logging in with", credentials);
+  } else {
+    // register logic here
+    console.log("Registering with", credentials);
+  }
+
+  router.push("/");
 };
 </script>
