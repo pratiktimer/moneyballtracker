@@ -13,14 +13,14 @@
         <q-form v-if="tab === 'login'" class="q-gutter-md">
           <q-input
             class="q-mb-md"
-            bg-color="white"
+            :bg-color="useLightOrDark('white', 'black')"
             filled
             label="Email"
             type="email"
             autocomplete="email"
           />
           <q-input
-            bg-color="white"
+            :bg-color="useLightOrDark('white', 'black')"
             filled
             label="Password"
             type="password "
@@ -44,6 +44,7 @@ imports
 */
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
 import { ref } from "vue";
+import { useLightOrDark } from "src/use/useLightOrDark";
 /*
 tabs
 */
