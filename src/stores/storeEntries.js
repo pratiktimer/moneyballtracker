@@ -140,9 +140,14 @@ export const useStoreEntries = defineStore("entries", () => {
     }
   };
 
-  const deleteEntry = (entryId) => {
-    const index = getEntryIndexById(entryId);
-    entries.value.splice(index, 1);
+  const deleteEntry = async (entryId) => {
+    const { error } = await supabase.from("entries").delete().eq("id", entryId);
+
+    if (error) {
+      useShowErrorMessage("Could not delete entry: " + error.message);
+      return;
+    }
+
     removeSlideItemIfExists(entryId);
     Notify.create({
       message: "Entry deleted",

@@ -46,6 +46,10 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      env:{
+        SUPABASE_URL: "https://kgdevkoerhzokmulskxd.supabase.co",
+        SUPABASE_KEY: "sb_publishable_1cLJ2fN7HKgT7jiEtI2Bfw_Aza4fKTN"
+      },
       target: {
         browser: [ 'es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1' ],
         node: 'node20'
