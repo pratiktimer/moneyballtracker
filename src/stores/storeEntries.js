@@ -80,7 +80,10 @@ export const useStoreEntries = defineStore("entries", () => {
 
   const loadEntries = async () => {
     entriesLoaded.value = false;
-    let { data, error } = await supabase.from("entries").select("*");
+    let { data, error } = await supabase
+      .from("entries")
+      .select("*")
+      .order("order", { ascending: true });
     if (error) {
       useShowErrorMessage(error.message);
       return;
@@ -88,7 +91,6 @@ export const useStoreEntries = defineStore("entries", () => {
     if (data) {
       entries.value = data;
       entriesLoaded.value = true;
-
       subscribeToEntryChanges();
     }
   };
@@ -126,6 +128,7 @@ export const useStoreEntries = defineStore("entries", () => {
   const addEntry = async (addEntryForm) => {
     const newEntry = Object.assign({}, addEntryForm, {
       paid: false,
+      order: generateOrderNumber(),
     });
     if (newEntry.amount === null) newEntry.amount = 0;
     //entries.value.push(newEntry);
@@ -184,6 +187,11 @@ export const useStoreEntries = defineStore("entries", () => {
   /*
     helpers
   */
+
+  const generateOrderNumber = () => {
+    const orderNumbers = entries.value.map((entry) => entry.order);
+    return orderNumbers.length ? Math.max(...orderNumbers) + 1 : 1;
+  };
 
   const getEntryIndexById = (entryId) => {
     return entries.value.findIndex((entry) => entry.id === entryId);
