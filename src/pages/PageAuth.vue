@@ -48,6 +48,7 @@ imports
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
 import { computed, reactive, ref } from "vue";
 import { useLightOrDark } from "src/use/useLightOrDark";
+import { Dialog } from "quasar";
 /*
 tabs
 */
@@ -72,8 +73,12 @@ const credentials = reactive({
 });
 
 const formSubmit = () => {
-  if (tab.value === "login") {
-    console.log("Logging in with", credentials);
+  if (!credentials.email || !credentials.password) {
+    Dialog.create({
+      title: "Error",
+      message: "Please enter both email and password.",
+    });
+    return;
   }
 };
 </script>
