@@ -10,7 +10,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form v-if="tab === 'login'" class="q-gutter-md">
+        <q-form>
           <q-input
             class="q-mb-md"
             :bg-color="useLightOrDark('white', 'black')"
@@ -20,6 +20,7 @@
             autocomplete="email"
           />
           <q-input
+            class="q-mb-md"
             :bg-color="useLightOrDark('white', 'black')"
             filled
             label="Password"
@@ -30,7 +31,7 @@
             to="/"
             color="white"
             class="full-width"
-            label="Login"
+            :label="submitButtonTitle"
             outline
           />
         </q-form>
@@ -43,11 +44,19 @@
 imports
 */
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useLightOrDark } from "src/use/useLightOrDark";
 /*
 tabs
 */
 
 const tab = ref("login");
+
+/*
+submit button title
+*/
+
+const submitButtonTitle = computed(() => {
+  return tab.value === "login" ? "Login" : "Register";
+});
 </script>
