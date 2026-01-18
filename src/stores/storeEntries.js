@@ -1,165 +1,206 @@
-import { defineStore } from 'pinia'
-import { ref, computed, reactive, watch, nextTick } from 'vue'
-import { uid, Notify, LocalStorage } from 'quasar'
+import { defineStore } from "pinia";
+import { ref, computed, reactive, nextTick } from "vue";
+import { Notify } from "quasar";
+import supabase from "src/config/supabase";
+import { useShowErrorMessage } from "src/use/useShowErrorMessage";
 
-export const useStoreEntries = defineStore('entries', () => {
-
+export const useStoreEntries = defineStore("entries", () => {
   /*
     state
   */
-  
-    const entries = ref([
-      // {
-      //   id: 'id1',
-      //   name: 'Salary',
-      //   amount: 4999.99,
-      //   paid: true
-      // },
-      // {
-      //   id: 'id2',
-      //   name: 'Rent',
-      //   amount: -999,
-      //   paid: false
-      // },
-      // {
-      //   id: 'id3',
-      //   name: 'Phone bill',
-      //   amount: -14.99,
-      //   paid: false
-      // },
-      // {
-      //   id: 'id4',
-      //   name: 'Unknown',
-      //   amount: 0,
-      //   paid: false
-      // },
-    ])
 
-    watch(entries.value, () => {
-      saveEntries()
-    })
+  const entries = ref([
+    // {
+    //   id: 'id1',
+    //   name: 'Salary',
+    //   amount: 4999.99,
+    //   paid: true
+    // },
+    // {
+    //   id: 'id2',
+    //   name: 'Rent',
+    //   amount: -999,
+    //   paid: false
+    // },
+    // {
+    //   id: 'id3',
+    //   name: 'Phone bill',
+    //   amount: -14.99,
+    //   paid: false
+    // },
+    // {
+    //   id: 'id4',
+    //   name: 'Unknown',
+    //   amount: 0,
+    //   paid: false
+    // },
+  ]);
 
-    const options = reactive({
-      sort: false
-    })
+  const entriesLoaded = ref(false);
 
+  const options = reactive({
+    sort: false,
+  });
 
   /*
     getters
   */
-  
-    const balance = computed(() => {
-      return entries.value.reduce((accumulator, { amount }) => {
-        return accumulator + amount
-      }, 0)
-    })
 
-    const balancePaid = computed(() => {
-      return entries.value.reduce((accumulator, { amount, paid }) => {
-        return paid ? accumulator + amount : accumulator
-      }, 0)
-    })
+  const balance = computed(() => {
+    return entries.value.reduce((accumulator, { amount }) => {
+      return accumulator + amount;
+    }, 0);
+  });
 
-    const runningBalances = computed(() => {
-      let runningBalances = [],
-          currentRunningBalance = 0
+  const balancePaid = computed(() => {
+    return entries.value.reduce((accumulator, { amount, paid }) => {
+      return paid ? accumulator + amount : accumulator;
+    }, 0);
+  });
 
-      if (entries.value.length) {
-        entries.value.forEach(entry => {
-          let entryAmount = entry.amount ? entry.amount : 0
-          currentRunningBalance = currentRunningBalance + entryAmount
-          runningBalances.push(currentRunningBalance)
-        })
-      }
+  const runningBalances = computed(() => {
+    let runningBalances = [],
+      currentRunningBalance = 0;
 
-      return runningBalances
-    })
+    if (entries.value.length) {
+      entries.value.forEach((entry) => {
+        let entryAmount = entry.amount ? entry.amount : 0;
+        currentRunningBalance = currentRunningBalance + entryAmount;
+        runningBalances.push(currentRunningBalance);
+      });
+    }
 
+    return runningBalances;
+  });
 
   /*
     actions
   */
-  
-    const addEntry = addEntryForm => {
-      const newEntry = Object.assign({}, addEntryForm, { id: uid(), paid: false })
-      if (newEntry.amount ===  null) newEntry.amount = 0
-      entries.value.push(newEntry)
-    }
 
-    const deleteEntry = entryId => {
-      const index = getEntryIndexById(entryId)
-      entries.value.splice(index, 1)
-      removeSlideItemIfExists(entryId)
-      Notify.create({
-        message: 'Entry deleted',
-        position: 'top'
-      })
+  const loadEntries = async () => {
+    entriesLoaded.value = false;
+    let { data, error } = await supabase.from("entries").select("*");
+    if (error) {
+      useShowErrorMessage(error.message);
+      return;
     }
+    if (data) {
+      entries.value = data;
+      entriesLoaded.value = true;
 
-    const updateEntry = (entryId, updates) => {
-      const index = getEntryIndexById(entryId)
-      Object.assign(entries.value[index], updates)
+      subscribeToEntryChanges();
     }
+  };
+  const subscribeToEntryChanges = () => {
+    supabase
+      .channel("Entries-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "entries" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            entries.value.push(payload.new);
+          }
+          if (payload.eventType === "UPDATE") {
+            const index = getEntryIndexById(payload.new.id);
+            if (index !== -1) {
+              entries.value[index] = payload.new;
+            }
+          }
+          if (payload.eventType === "DELETE") {
+            const index = getEntryIndexById(payload.old.id);
+            if (index !== -1) {
+              entries.value.splice(index, 1);
+              removeSlideItemIfExists(payload.old.id);
+              Notify.create({
+                message: "Entry deleted",
+                position: "top",
+              });
+            }
+          }
+        },
+      )
+      .subscribe();
+  };
+  const addEntry = async (addEntryForm) => {
+    const newEntry = Object.assign({}, addEntryForm, {
+      paid: false,
+    });
+    if (newEntry.amount === null) newEntry.amount = 0;
+    //entries.value.push(newEntry);
 
-    const sortEnd = ({ oldIndex, newIndex }) => {
-      const movedEntry = entries.value[oldIndex]
-      entries.value.splice(oldIndex, 1)
-      entries.value.splice(newIndex, 0, movedEntry)
+    const { error } = await supabase
+      .from("entries")
+      .insert([newEntry])
+      .select();
+
+    if (error) {
+      useShowErrorMessage("Could not add entry: " + error.message);
+      return;
     }
+  };
 
-    const saveEntries = () => {
-      LocalStorage.set('entries', entries.value)
-    }
+  const deleteEntry = (entryId) => {
+    const index = getEntryIndexById(entryId);
+    entries.value.splice(index, 1);
+    removeSlideItemIfExists(entryId);
+    Notify.create({
+      message: "Entry deleted",
+      position: "top",
+    });
+  };
 
-    const loadEntries = () => {
-      const savedEntries = LocalStorage.getItem('entries')
-      if (savedEntries) Object.assign(entries.value, savedEntries)
-    }
+  const updateEntry = (entryId, updates) => {
+    const index = getEntryIndexById(entryId);
+    Object.assign(entries.value[index], updates);
+  };
 
+  const sortEnd = ({ oldIndex, newIndex }) => {
+    const movedEntry = entries.value[oldIndex];
+    entries.value.splice(oldIndex, 1);
+    entries.value.splice(newIndex, 0, movedEntry);
+  };
 
   /*
     helpers
   */
-  
-    const getEntryIndexById = entryId => {
-      return entries.value.findIndex(entry => entry.id === entryId)
-    }
 
-    const removeSlideItemIfExists = entryId => {
-      // hacky fix: when deleting (after sorting),
-      // sometimes the slide item is not removed
-      // from the dom. this will remove the slide
-      // item from the dom if it still exists
-      // (after entry removed from entries array)
-      nextTick(() => {
-        const slideItem = document.querySelector(`#id-${ entryId }`)
-        if (slideItem) slideItem.remove()
-      })
-    }
+  const getEntryIndexById = (entryId) => {
+    return entries.value.findIndex((entry) => entry.id === entryId);
+  };
 
+  const removeSlideItemIfExists = (entryId) => {
+    // hacky fix: when deleting (after sorting),
+    // sometimes the slide item is not removed
+    // from the dom. this will remove the slide
+    // item from the dom if it still exists
+    // (after entry removed from entries array)
+    nextTick(() => {
+      const slideItem = document.querySelector(`#id-${entryId}`);
+      if (slideItem) slideItem.remove();
+    });
+  };
 
   /*
     return
   */
-  
-    return { 
 
-      // state
-      entries,
-      options,
+  return {
+    // state
+    entries,
+    entriesLoaded,
+    options,
 
-      // getters
-      balance,
-      balancePaid,
-      runningBalances,
+    // getters
+    balance,
+    balancePaid,
+    runningBalances,
 
-      // actions
-      addEntry,
-      deleteEntry,
-      updateEntry,
-      sortEnd,
-      loadEntries
-
-    }
-    
-})
+    // actions
+    loadEntries,
+    addEntry,
+    deleteEntry,
+    updateEntry,
+    sortEnd,
+  };
+});
