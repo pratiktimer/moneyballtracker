@@ -55,7 +55,7 @@ import { useStoreAuth } from "src/stores/storeAuth";
 tabs
 */
 
-const tab = ref("register");
+const tab = ref("login");
 
 /*
 router
@@ -99,7 +99,7 @@ const formSubmit = () => {
 const formSubmitSuccess = () => {
   if (tab.value === "login") {
     // login logic here
-    console.log("Logging in with", credentials);
+    storeAuth.loginUser(credentials);
   } else {
     // register logic here
     storeAuth.registerUser(credentials);

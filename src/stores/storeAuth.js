@@ -22,6 +22,21 @@ export const useStoreAuth = defineStore("auth", () => {
     }
   };
 
+  const loginUser = async ({ email, password }) => {
+    let { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      useShowErrorMessage(error.message);
+      return;
+    }
+
+    if (data) {
+      console.log("User logged in:", data);
+    }
+  };
   const logOutUser = async () => {
     let { error } = await supabase.auth.signOut();
 
@@ -40,6 +55,7 @@ export const useStoreAuth = defineStore("auth", () => {
   return {
     //actions
     registerUser,
+    loginUser,
     logOutUser,
   };
 });
