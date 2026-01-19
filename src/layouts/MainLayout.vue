@@ -55,7 +55,13 @@
         </q-item>
         <q-separator spaced />
 
-        <q-item to="/auth" clickable class="text-white" tag="a">
+        <q-item
+          @click="storeAuth.logOutUser"
+          to="/auth"
+          clickable
+          class="text-white"
+          tag="a"
+        >
           <q-item-section avatar>
             <q-icon name="logout" />
           </q-item-section>
@@ -77,6 +83,7 @@
 import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { useStoreEntries } from "src/stores/storeEntries";
+import { useStoreAuth } from "src/stores/storeAuth";
 import { useLightOrDark } from "src/use/useLightOrDark";
 import NavLink from "components/Nav/NavLink.vue";
 import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
@@ -86,7 +93,8 @@ defineOptions({
 });
 
 const $q = useQuasar(),
-  storeEntries = useStoreEntries();
+  storeEntries = useStoreEntries(),
+  storeAuth = useStoreAuth();
 
 const navLinks = [
   {
