@@ -49,18 +49,12 @@ import ToolbarTitle from "src/components/Layout/ToolbarTitle.vue";
 import { computed, reactive, ref } from "vue";
 import { useLightOrDark } from "src/use/useLightOrDark";
 import { Dialog } from "quasar";
-import { useRouter } from "vue-router";
 import { useStoreAuth } from "src/stores/storeAuth";
 /*
 tabs
 */
 
 const tab = ref("login");
-
-/*
-router
-*/
-const router = useRouter();
 
 /*
 submit button title
@@ -104,7 +98,5 @@ const formSubmitSuccess = () => {
     // register logic here
     storeAuth.registerUser(credentials);
   }
-
-  router.push("/");
 };
 </script>

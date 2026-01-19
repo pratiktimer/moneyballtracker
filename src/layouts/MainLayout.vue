@@ -57,7 +57,6 @@
 
         <q-item
           @click="storeAuth.logOutUser"
-          to="/auth"
           clickable
           class="text-white"
           tag="a"
@@ -73,7 +72,7 @@
               class="text-white"
               caption
             >
-              Logged in as {{ storeAuth.user.email }}
+              {{ storeAuth.userDetails.email }}
             </q-item-label>
           </q-item-section>
         </q-item>
