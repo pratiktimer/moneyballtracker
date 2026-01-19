@@ -50,11 +50,12 @@ import { computed, reactive, ref } from "vue";
 import { useLightOrDark } from "src/use/useLightOrDark";
 import { Dialog } from "quasar";
 import { useRouter } from "vue-router";
+import { useStoreAuth } from "src/stores/storeAuth";
 /*
 tabs
 */
 
-const tab = ref("login");
+const tab = ref("register");
 
 /*
 router
@@ -64,10 +65,15 @@ const router = useRouter();
 /*
 submit button title
 */
-
 const submitButtonTitle = computed(() => {
   return tab.value === "login" ? "Login" : "Register";
 });
+
+/*
+stores
+*/
+
+const storeAuth = useStoreAuth();
 
 /*
 form
@@ -96,7 +102,7 @@ const formSubmitSuccess = () => {
     console.log("Logging in with", credentials);
   } else {
     // register logic here
-    console.log("Registering with", credentials);
+    storeAuth.registerUser(credentials);
   }
 
   router.push("/");
