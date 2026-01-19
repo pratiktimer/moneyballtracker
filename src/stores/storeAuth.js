@@ -6,6 +6,18 @@ export const useStoreAuth = defineStore("auth", () => {
   /*
     actions
   */
+
+  const init = () => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event, session);
+
+      if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
+        // handle initial session
+      } else if (event === "SIGNED_OUT") {
+        // handle sign out event
+      }
+    });
+  };
   const registerUser = async ({ email, password }) => {
     let { data, error } = await supabase.auth.signUp({
       email,
@@ -54,6 +66,7 @@ export const useStoreAuth = defineStore("auth", () => {
 
   return {
     //actions
+    init,
     registerUser,
     loginUser,
     logOutUser,
