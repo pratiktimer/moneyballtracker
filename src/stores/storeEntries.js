@@ -4,7 +4,8 @@ import { Notify } from "quasar";
 import supabase from "src/config/supabase";
 import { useShowErrorMessage } from "src/use/useShowErrorMessage";
 import { useNonReactiveCopy } from "src/use/useNonReactiveCopy";
-
+import { useStoreAuth } from "./storeAuth";
+let entriesChannel;
 export const useStoreEntries = defineStore("entries", () => {
   /*
     state
@@ -79,10 +80,12 @@ export const useStoreEntries = defineStore("entries", () => {
   */
 
   const loadEntries = async () => {
+    const storeAuth = useStoreAuth();
     entriesLoaded.value = false;
     let { data, error } = await supabase
       .from("entries")
       .select("*")
+      .eq("user_id", storeAuth.userDetails.id)
       .order("order", { ascending: true });
     if (error) {
       useShowErrorMessage(error.message);
@@ -95,11 +98,17 @@ export const useStoreEntries = defineStore("entries", () => {
     }
   };
   const subscribeToEntryChanges = () => {
-    supabase
+    const storeAuth = useStoreAuth();
+    entriesChannel = supabase
       .channel("Entries-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "entries" },
+        {
+          event: "*",
+          schema: "public",
+          table: "entries",
+          filter: `user_id=eq."${storeAuth.userDetails.id}"`,
+        },
         (payload) => {
           if (payload.eventType === "INSERT") {
             entries.value.push(payload.new);
@@ -125,10 +134,20 @@ export const useStoreEntries = defineStore("entries", () => {
       )
       .subscribe();
   };
+
+  const unsubscribeEntries = () => {
+    supabase.removeChannel(entriesChannel);
+  };
+  const clearEntries = () => {
+    entries.value = [];
+    entriesLoaded.value = false;
+  };
   const addEntry = async (addEntryForm) => {
+    const storeAuth = useStoreAuth();
     const newEntry = Object.assign({}, addEntryForm, {
       paid: false,
       order: generateOrderNumber(),
+      user_id: storeAuth.userDetails.id,
     });
     if (newEntry.amount === null) newEntry.amount = 0;
     //entries.value.push(newEntry);
@@ -244,6 +263,8 @@ export const useStoreEntries = defineStore("entries", () => {
 
     // actions
     loadEntries,
+    unsubscribeEntries,
+    clearEntries,
     addEntry,
     deleteEntry,
     updateEntry,
