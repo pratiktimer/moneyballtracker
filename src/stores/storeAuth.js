@@ -1,8 +1,22 @@
 import { defineStore } from "pinia";
 import supabase from "src/config/supabase";
 import { useShowErrorMessage } from "src/use/useShowErrorMessage";
+import { reactive } from "vue";
 
 export const useStoreAuth = defineStore("auth", () => {
+  /*
+    state
+  */
+
+  const userDetailsDefault = {
+    id: null,
+    email: null,
+  };
+
+  const userDetails = reactive({
+    ...userDetailsDefault,
+  });
+
   /*
     actions
   */
@@ -13,8 +27,11 @@ export const useStoreAuth = defineStore("auth", () => {
 
       if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
         // handle initial session
+        userDetails.id = session?.user.id || null;
+        userDetails.email = session?.user.email || null;
       } else if (event === "SIGNED_OUT") {
         // handle sign out event
+        Object.assign(userDetails, userDetailsDefault);
       }
     });
   };
@@ -65,6 +82,8 @@ export const useStoreAuth = defineStore("auth", () => {
   */
 
   return {
+    //state
+    userDetails,
     //actions
     init,
     registerUser,
