@@ -1,3 +1,3 @@
-export function useNonReactiveCopy(message) {
-  return JSON.parse(JSON.stringify(message));
+export function useNonReactiveCopy(data) {
+  return JSON.parse(JSON.stringify(data))
 }

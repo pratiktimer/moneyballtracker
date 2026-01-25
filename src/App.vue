@@ -3,31 +3,32 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useQuasar } from "quasar";
-import { useStoreSettings } from "src/stores/storeSettings";
-import { useStoreAuth } from "src/stores/storeAuth";
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+import { useStoreAuth } from 'src/stores/storeAuth'
+import { useStoreSettings } from 'src/stores/storeSettings'
 
 defineOptions({
-  name: "App",
+  name: 'App'
 });
 
 const storeAuth = useStoreAuth(),
-  storeSettings = useStoreSettings(),
-  $q = useQuasar(),
-  router = useRouter();
+      storeSettings = useStoreSettings(),
+      $q = useQuasar(),
+      router = useRouter()
 
 onMounted(() => {
-  storeAuth.init();
-  storeSettings.loadSettings();
+  storeAuth.init()
+  storeSettings.loadSettings()
 
   if ($q.platform.is.electron) {
-    ipcRenderer.on("show-settings", () => {
-      router.push("/settings");
-    });
+    ipcRenderer.on('show-settings', () => {
+      router.push('/settings')
+    })
   }
-});
+
+})
 
 // window.addEventListener('contextmenu', e => {
 //   e.preventDefault()

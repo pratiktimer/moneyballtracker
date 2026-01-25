@@ -1,10 +1,8 @@
-import { Dialog } from "quasar";
+import { Dialog } from 'quasar'
+
 export function useShowErrorMessage(message) {
   Dialog.create({
-    title: "Error",
-    message: `An error occurred: ${message}`,
-    ok: {
-      label: "OK",
-    },
-  });
+    title: 'Error',
+    message
+  })
 }

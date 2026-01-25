@@ -3,6 +3,34 @@
     <div class="q-pa-md">
       <q-list bordered padding>
 
+        <q-item-label header>Profile</q-item-label>
+
+        <q-item tag="label" v-ripple>
+          <q-item-section>
+            <q-item-label>Avatar</q-item-label>
+          </q-item-section>
+          <q-item-section side >
+            <q-file
+              v-model="storeSettings.profile.avatarFile"
+              @update:model-value="storeSettings.uploadAvatar"
+              label="Upload Avatar"
+              outlined
+              dense
+            >
+              <template v-slot:prepend>
+                <q-avatar
+                  v-if="storeSettings.profile.avatarUrl"
+                >
+                  <img :src="storeSettings.profile.avatarUrl">
+                </q-avatar>
+                <q-icon v-else name="attach_file" />
+              </template>
+            </q-file>
+          </q-item-section>
+        </q-item>
+
+        <q-separator spaced />
+
         <q-item-label header>Entries</q-item-label>
 
         <q-item tag="label" v-ripple>

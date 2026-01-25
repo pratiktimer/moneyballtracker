@@ -1,12 +1,24 @@
 <template>
   <q-page>
     <div class="q-pa-md">
-      <template v-if="storeEntries.entriesLoaded">
-        <transition appear enter-active-class="animated jackInTheBox slower">
-          <NothingHere v-if="!storeEntries.entries.length" />
+
+      <template
+        v-if="storeEntries.entriesLoaded"
+      >
+        <transition
+          appear
+          enter-active-class="animated jackInTheBox slower"
+        >
+          <NothingHere
+            v-if="!storeEntries.entries.length"
+          />
         </transition>
 
-        <q-list v-if="storeEntries.entriesLoaded" class="entries">
+        <q-list
+          v-if="storeEntries.entries.length"
+          class="entries"
+        >
+
           <Sortable
             @end="storeEntries.sortEnd"
             :list="storeEntries.entries"
@@ -14,18 +26,34 @@
             item-key="id"
             tag="div"
           >
-            <template #item="{ element, index }">
-              <Entry :key="element.id" :entry="element" :index="index" />
+            <template #item="{element, index}">
+              <Entry 
+                :key="element.id"
+                :entry="element"
+                :index="index"
+              />
             </template>
           </Sortable>
+
         </q-list>
       </template>
-      <div v-else class="row justify-center q-pa-md">
-        <q-spinner color="primary" size="50px"></q-spinner>
+
+      <div
+        v-else
+        class="text-center q-pa-xl"
+      >
+        <q-spinner
+          color="primary"
+          size="3em"
+          :thickness="10"
+        />
       </div>
+
     </div>
 
-    <q-footer class="bg-transparent">
+    <q-footer
+      class="bg-transparent"
+    >
       <transition
         appear
         enter-active-class="animated fadeInUp"
@@ -39,20 +67,23 @@
 </template>
 
 <script setup>
-/*
+
+  /*
     imports
   */
+  
+    import { useStoreEntries } from 'src/stores/storeEntries'
+    import Balance from 'src/components/Entries/Balance.vue'
+    import AddEntry from 'src/components/Entries/AddEntry.vue'
+    import Entry from 'src/components/Entries/Entry.vue'
+    import NothingHere from 'src/components/Entries/NothingHere.vue'
+    import { Sortable } from 'sortablejs-vue3'
 
-import { useStoreEntries } from "src/stores/storeEntries";
-import Balance from "src/components/Entries/Balance.vue";
-import AddEntry from "src/components/Entries/AddEntry.vue";
-import Entry from "src/components/Entries/Entry.vue";
-import NothingHere from "src/components/Entries/NothingHere.vue";
-import { Sortable } from "sortablejs-vue3";
 
-/*
+  /*
     stores
   */
+  
+    const storeEntries = useStoreEntries()
 
-const storeEntries = useStoreEntries();
 </script>
