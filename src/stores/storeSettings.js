@@ -35,6 +35,7 @@ export const useStoreSettings = defineStore("settings", () => {
   const profileDefault = {
     avatarFile: null,
     avatarUrl: null,
+    bio: "",
   };
   const profile = reactive({
     ...profileDefault,
@@ -89,6 +90,22 @@ export const useStoreSettings = defineStore("settings", () => {
       getAvatarUrl();
     }
   };
+  const saveBio = async () => {
+    const storeAuth = useStoreAuth();
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .upsert({
+        id: storeAuth.userDetails.id,
+        bio: profile.bio,
+      })
+      .select();
+
+    if (error)
+      useShowErrorMessage(
+        "Could not upsert row on profiles table." + error.message,
+      );
+  };
 
   const getAvatarUrl = async () => {
     const storeAuth = useStoreAuth();
@@ -102,7 +119,22 @@ export const useStoreSettings = defineStore("settings", () => {
     if (profiles) {
       if (profiles[0]?.avatar_filename) {
         const avatarFilename = profiles[0].avatar_filename;
-        profile.avatarUrl = `https://kgdevkoerhzokmulskxd.supabase.co/storage/v1/object/public/avatars/${storeAuth.userDetails.id}/${avatarFilename}`;
+        profile.avatarUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/avatars/${storeAuth.userDetails.id}/${avatarFilename}`;
+      }
+    }
+  };
+  const getBio = async () => {
+    const storeAuth = useStoreAuth();
+
+    let { data: profiles, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", storeAuth.userDetails.id);
+
+    if (error) useShowErrorMessage("Could not get Avatar URL from Supabase.");
+    if (profiles) {
+      if (profiles[0]?.bio) {
+        profile.bio = profiles[0].bio;
       }
     }
   };
@@ -126,6 +158,8 @@ export const useStoreSettings = defineStore("settings", () => {
     loadSettings,
     uploadAvatar,
     getAvatarUrl,
+    getBio,
+    saveBio,
     resetProfile,
   };
 });
