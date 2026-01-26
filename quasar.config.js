@@ -9,7 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require("quasar/wrappers");
-
+const isLocalSupabase = true;
 module.exports = configure(function (/* ctx */) {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -40,8 +40,12 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
       env: {
-        SUPABASE_URL: "https://kgdevkoerhzokmulskxd.supabase.co",
-        SUPABASE_KEY: "sb_publishable_1cLJ2fN7HKgT7jiEtI2Bfw_Aza4fKTN",
+        SUPABASE_URL: isLocalSupabase
+          ? "http://127.0.0.1:54321"
+          : "https://kgdevkoerhzokmulskxd.supabase.co",
+        SUPABASE_KEY: isLocalSupabase
+          ? "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz"
+          : "sb_publishable_1cLJ2fN7HKgT7jiEtI2Bfw_Aza4fKTN",
       },
       target: {
         browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
